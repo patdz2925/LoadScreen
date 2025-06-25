@@ -1,0 +1,143 @@
+loadstring([[
+local player = game.Players.LocalPlayer
+
+-- 🛡 Prevent duplicate GUI
+if player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("PetDuplicatorGUI") then
+    return
+end
+
+local character = player.Character or player.CharacterAdded:Wait()
+local UIS = game:GetService("UserInputService")
+
+-- GUI Setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+ScreenGui.Name = "PetDuplicatorGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Main Frame
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 220, 0, 240)
+MainFrame.Position = UDim2.new(0.5, -110, 0.5, -120)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+Instance.new("UICorner", MainFrame)
+
+-- Title
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "PET/SEED SPAWNER"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundTransparency = 1
+
+-- Subtitle
+local Subtitle = Instance.new("TextLabel", MainFrame)
+Subtitle.Size = UDim2.new(1, 0, 0, 20)
+Subtitle.Position = UDim2.new(0, 0, 0, 28)
+Subtitle.Text = "by pacide"
+Subtitle.Font = Enum.Font.Gotham
+Subtitle.TextSize = 12
+Subtitle.TextColor3 = Color3.fromRGB(180, 180, 180)
+Subtitle.BackgroundTransparency = 1
+
+-- Pet Name
+local PetBox = Instance.new("TextBox", MainFrame)
+PetBox.PlaceholderText = "Pet Name"
+PetBox.Position = UDim2.new(0.1, 0, 0.25, 0)
+PetBox.Size = UDim2.new(0.8, 0, 0, 25)
+PetBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+PetBox.TextColor3 = Color3.new(1, 1, 1)
+PetBox.Font = Enum.Font.Gotham
+PetBox.TextSize = 14
+
+-- Weight
+local WeightBox = Instance.new("TextBox", MainFrame)
+WeightBox.PlaceholderText = "Weight"
+WeightBox.Position = UDim2.new(0.1, 0, 0.42, 0)
+WeightBox.Size = UDim2.new(0.8, 0, 0, 25)
+WeightBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+WeightBox.TextColor3 = Color3.new(1, 1, 1)
+WeightBox.Font = Enum.Font.Gotham
+WeightBox.TextSize = 14
+
+-- Age
+local AgeBox = Instance.new("TextBox", MainFrame)
+AgeBox.PlaceholderText = "Age"
+AgeBox.Position = UDim2.new(0.1, 0, 0.59, 0)
+AgeBox.Size = UDim2.new(0.8, 0, 0, 25)
+AgeBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+AgeBox.TextColor3 = Color3.new(1, 1, 1)
+AgeBox.Font = Enum.Font.Gotham
+AgeBox.TextSize = 14
+
+-- Spawn Button
+local SpawnButton = Instance.new("TextButton", MainFrame)
+SpawnButton.Text = "SPAWN PET"
+SpawnButton.Position = UDim2.new(0.1, 0, 0.77, 0)
+SpawnButton.Size = UDim2.new(0.8, 0, 0, 30)
+SpawnButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+SpawnButton.TextColor3 = Color3.new(1, 1, 1)
+SpawnButton.Font = Enum.Font.GothamBold
+SpawnButton.TextSize = 14
+
+-- Toggle Key
+local TOGGLE_KEY = Enum.KeyCode.P
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == TOGGLE_KEY then
+        MainFrame.Visible = not MainFrame.Visible
+    end
+end)
+
+-- Toggle Button
+local ToggleButton = Instance.new("TextButton", ScreenGui)
+ToggleButton.Size = UDim2.new(0, 80, 0, 30)
+ToggleButton.Position = UDim2.new(0, 10, 0, 10)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ToggleButton.Text = "Hide UI"
+ToggleButton.Font = Enum.Font.Gotham
+ToggleButton.TextSize = 14
+ToggleButton.TextColor3 = Color3.new(1,1,1)
+
+Instance.new("UICorner", ToggleButton)
+
+local uiVisible = true
+ToggleButton.MouseButton1Click:Connect(function()
+    uiVisible = not uiVisible
+    MainFrame.Visible = uiVisible
+    ToggleButton.Text = uiVisible and "Hide UI" or "Show UI"
+end)
+
+-- Duplication Logic
+SpawnButton.MouseButton1Click:Connect(function()
+    local petName = PetBox.Text
+    local weight = WeightBox.Text
+    local age = AgeBox.Text
+
+    local heldPet = player.Character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
+
+    if heldPet then
+        local clone = heldPet:Clone()
+        clone.Name = petName .. " [" .. weight .. "KG] [Age " .. age .. "]"
+
+        if not clone:FindFirstChild("Handle") then
+            local handle = Instance.new("Part")
+            handle.Name = "Handle"
+            handle.Size = Vector3.new(1,1,1)
+            handle.Color = Color3.fromRGB(255,170,0)
+            handle.Anchored = false
+            handle.CanCollide = false
+            handle.Position = character:WaitForChild("HumanoidRootPart").Position + Vector3.new(0,2,0)
+            handle.Parent = clone
+        end
+
+        clone.Parent = player.Backpack
+    else
+        warn("No pet found. Make sure you are holding it.")
+    end
+end)
+]])()
