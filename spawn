@@ -1,143 +1,88 @@
-loadstring([[
 local player = game.Players.LocalPlayer
-
--- 🛡 Prevent duplicate GUI
-if player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("PetDuplicatorGUI") then
-    return
-end
-
-local character = player.Character or player.CharacterAdded:Wait()
-local UIS = game:GetService("UserInputService")
-
--- GUI Setup
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = player:WaitForChild("PlayerGui")
-ScreenGui.Name = "PetDuplicatorGUI"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "PersistentLoadingScreen"
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Main Frame
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, 220, 0, 240)
-MainFrame.Position = UDim2.new(0.5, -110, 0.5, -120)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.Active = true
-MainFrame.Draggable = true
-
-Instance.new("UICorner", MainFrame)
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 400, 0, 120)
+frame.Position = UDim2.new(0.5, -200, 0.5, -60)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+Instance.new("UICorner", frame)
 
 -- Title
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.Text = "PET/SEED SPAWNER"
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 14
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.BackgroundTransparency = 1
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 5)
+title.Text = "[SUMMER] Pacide's Pet Spawner"
+title.Font = Enum.Font.FredokaOne
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 16
+title.BackgroundTransparency = 1
 
 -- Subtitle
-local Subtitle = Instance.new("TextLabel", MainFrame)
-Subtitle.Size = UDim2.new(1, 0, 0, 20)
-Subtitle.Position = UDim2.new(0, 0, 0, 28)
-Subtitle.Text = "by pacide"
-Subtitle.Font = Enum.Font.Gotham
-Subtitle.TextSize = 12
-Subtitle.TextColor3 = Color3.fromRGB(180, 180, 180)
-Subtitle.BackgroundTransparency = 1
+local subtitle = Instance.new("TextLabel", frame)
+subtitle.Size = UDim2.new(1, 0, 0, 20)
+subtitle.Position = UDim2.new(0, 0, 0, 30)
+subtitle.Text = "Loading... please wait"
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+subtitle.TextSize = 13
+subtitle.BackgroundTransparency = 1
 
--- Pet Name
-local PetBox = Instance.new("TextBox", MainFrame)
-PetBox.PlaceholderText = "Pet Name"
-PetBox.Position = UDim2.new(0.1, 0, 0.25, 0)
-PetBox.Size = UDim2.new(0.8, 0, 0, 25)
-PetBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-PetBox.TextColor3 = Color3.new(1, 1, 1)
-PetBox.Font = Enum.Font.Gotham
-PetBox.TextSize = 14
+-- Progress Text
+local percentageLabel = Instance.new("TextLabel", frame)
+percentageLabel.Size = UDim2.new(1, 0, 0, 20)
+percentageLabel.Position = UDim2.new(0, 0, 0, 50)
+percentageLabel.Text = "0%"
+percentageLabel.Font = Enum.Font.GothamBold
+percentageLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+percentageLabel.TextSize = 14
+percentageLabel.BackgroundTransparency = 1
 
--- Weight
-local WeightBox = Instance.new("TextBox", MainFrame)
-WeightBox.PlaceholderText = "Weight"
-WeightBox.Position = UDim2.new(0.1, 0, 0.42, 0)
-WeightBox.Size = UDim2.new(0.8, 0, 0, 25)
-WeightBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-WeightBox.TextColor3 = Color3.new(1, 1, 1)
-WeightBox.Font = Enum.Font.Gotham
-WeightBox.TextSize = 14
+-- Progress Bar Background
+local progressBarBG = Instance.new("Frame", frame)
+progressBarBG.Size = UDim2.new(0.9, 0, 0, 10)
+progressBarBG.Position = UDim2.new(0.05, 0, 1, -25)
+progressBarBG.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+progressBarBG.BorderSizePixel = 0
+Instance.new("UICorner", progressBarBG)
 
--- Age
-local AgeBox = Instance.new("TextBox", MainFrame)
-AgeBox.PlaceholderText = "Age"
-AgeBox.Position = UDim2.new(0.1, 0, 0.59, 0)
-AgeBox.Size = UDim2.new(0.8, 0, 0, 25)
-AgeBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-AgeBox.TextColor3 = Color3.new(1, 1, 1)
-AgeBox.Font = Enum.Font.Gotham
-AgeBox.TextSize = 14
+-- Progress Bar Fill
+local progressBarFill = Instance.new("Frame", progressBarBG)
+progressBarFill.Size = UDim2.new(0, 0, 1, 0)
+progressBarFill.Position = UDim2.new(0, 0, 0, 0)
+progressBarFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+progressBarFill.BorderSizePixel = 0
+Instance.new("UICorner", progressBarFill)
 
--- Spawn Button
-local SpawnButton = Instance.new("TextButton", MainFrame)
-SpawnButton.Text = "SPAWN PET"
-SpawnButton.Position = UDim2.new(0.1, 0, 0.77, 0)
-SpawnButton.Size = UDim2.new(0.8, 0, 0, 30)
-SpawnButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-SpawnButton.TextColor3 = Color3.new(1, 1, 1)
-SpawnButton.Font = Enum.Font.GothamBold
-SpawnButton.TextSize = 14
+-- Animate Progress (30 seconds)
+local totalDuration = 30
+for i = 1, 100 do
+	task.wait(totalDuration / 100)
+	percentageLabel.Text = tostring(i) .. "%"
+	progressBarFill.Size = UDim2.new(i / 100, 0, 1, 0)
+end
 
--- Toggle Key
-local TOGGLE_KEY = Enum.KeyCode.P
-UIS.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == TOGGLE_KEY then
-        MainFrame.Visible = not MainFrame.Visible
-    end
+-- After complete, show rotating loading circle
+progressBarBG.Visible = false
+progressBarFill.Visible = false
+percentageLabel.Visible = false
+subtitle.Text = "Please wait for the script to load..."
+
+-- Loading circle
+local loadingCircle = Instance.new("ImageLabel", frame)
+loadingCircle.Image = "rbxassetid://7733960981" -- Roblox spinner icon
+loadingCircle.Size = UDim2.new(0, 24, 0, 24)
+loadingCircle.Position = UDim2.new(0.5, -12, 1, -28)
+loadingCircle.BackgroundTransparency = 1
+
+-- Rotation loop
+task.spawn(function()
+	while true do
+		loadingCircle.Rotation += 5
+		task.wait(0.03)
+	end
 end)
-
--- Toggle Button
-local ToggleButton = Instance.new("TextButton", ScreenGui)
-ToggleButton.Size = UDim2.new(0, 80, 0, 30)
-ToggleButton.Position = UDim2.new(0, 10, 0, 10)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-ToggleButton.Text = "Hide UI"
-ToggleButton.Font = Enum.Font.Gotham
-ToggleButton.TextSize = 14
-ToggleButton.TextColor3 = Color3.new(1,1,1)
-
-Instance.new("UICorner", ToggleButton)
-
-local uiVisible = true
-ToggleButton.MouseButton1Click:Connect(function()
-    uiVisible = not uiVisible
-    MainFrame.Visible = uiVisible
-    ToggleButton.Text = uiVisible and "Hide UI" or "Show UI"
-end)
-
--- Duplication Logic
-SpawnButton.MouseButton1Click:Connect(function()
-    local petName = PetBox.Text
-    local weight = WeightBox.Text
-    local age = AgeBox.Text
-
-    local heldPet = player.Character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
-
-    if heldPet then
-        local clone = heldPet:Clone()
-        clone.Name = petName .. " [" .. weight .. "KG] [Age " .. age .. "]"
-
-        if not clone:FindFirstChild("Handle") then
-            local handle = Instance.new("Part")
-            handle.Name = "Handle"
-            handle.Size = Vector3.new(1,1,1)
-            handle.Color = Color3.fromRGB(255,170,0)
-            handle.Anchored = false
-            handle.CanCollide = false
-            handle.Position = character:WaitForChild("HumanoidRootPart").Position + Vector3.new(0,2,0)
-            handle.Parent = clone
-        end
-
-        clone.Parent = player.Backpack
-    else
-        warn("No pet found. Make sure you are holding it.")
-    end
-end)
-]])()
